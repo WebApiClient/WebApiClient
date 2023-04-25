@@ -17,7 +17,7 @@ jobs:
 
       - name: Pull upstream changes
         id: sync
-        uses: aormsby/Fork-Sync-With-Upstream-action@v3.1
+        uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
         with:
           target_sync_branch: "master"
           # REQUIRED 'target_repo_token' exactly like this!
