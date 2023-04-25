@@ -26,7 +26,7 @@ jobs:
           upstream_sync_repo: dotnetcore/webapiclient
 
           # Set test_mode false to run the true action!!
-          test_mode: true
+          test_mode: false
 
       - name: Timestamp
         run: date
