@@ -19,14 +19,14 @@ jobs:
         id: sync
         uses: aormsby/Fork-Sync-With-Upstream-action@v3.1
         with:
-          target_sync_branch: "" # empty string means all branches
+          target_sync_branch: "*"
           # REQUIRED 'target_repo_token' exactly like this!
           target_repo_token: ${{ secrets.GITHUB_TOKEN }}
-          upstream_sync_branch: "" # empty string means all branches
+          upstream_sync_branch: "*"
           upstream_sync_repo: dotnetcore/webapiclient
 
           # Set test_mode false to run the true action!!
-          test_mode: false
+          test_mode: true
 
       - name: Timestamp
         run: date
