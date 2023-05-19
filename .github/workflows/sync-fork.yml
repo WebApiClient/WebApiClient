@@ -1,7 +1,6 @@
 ﻿on:
   schedule:
     - cron: "*/30 * * * *"
-    # scheduled at 07:00 every Monday and Thursday
   workflow_dispatch:
 
 jobs:
