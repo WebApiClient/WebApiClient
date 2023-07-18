@@ -7,7 +7,8 @@ jobs:
   sync_with_upstream:
     runs-on: ubuntu-latest
     name: Sync all branches with upstream latest
-
+    permissions:
+      contents: write
     steps:
       - name: Checkout master
         uses: actions/checkout@v2
