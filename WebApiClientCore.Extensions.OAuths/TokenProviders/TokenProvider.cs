@@ -27,9 +27,9 @@ namespace WebApiClientCore.Extensions.OAuths.TokenProviders
         private readonly AsyncRoot asyncRoot = new AsyncRoot();
 
         /// <summary>
-        /// 获取或设置别名
+        /// 获取或设置名称
         /// </summary>
-        public string Name { get; set; } = Options.DefaultName;
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Token提供者抽象类

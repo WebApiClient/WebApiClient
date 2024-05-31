@@ -8,11 +8,6 @@
     sealed class TokenProviderService<THttpApi, TTokenProvider> : ITokenProviderService where TTokenProvider : ITokenProvider
     {
         /// <summary>
-        /// 获取提供者的别名
-        /// </summary>
-        public static string Name { get; } = GetTokenProviderName();
-
-        /// <summary>
         /// 获取token提供者
         /// </summary>
         public ITokenProvider TokenProvider { get; }
@@ -23,19 +18,33 @@
         /// <param name="tokenProvider">token提供者</param>
         public TokenProviderService(TTokenProvider tokenProvider)
         {
-            tokenProvider.Name = Name;
             this.TokenProvider = tokenProvider;
         }
 
         /// <summary>
-        /// 返回服务提供者的别名
+        /// 设置服务提供者的名称
+        /// </summary>
+        /// <param name="alias"></param>
+        public void SetProviderName(string alias)
+        {
+            this.TokenProvider.Name = GetTokenProviderName(alias);
+        }
+
+        /// <summary>
+        /// 获取服务提供者的名称
         /// </summary> 
         /// <returns></returns>
-        private static string GetTokenProviderName()
+        public static string GetTokenProviderName(string alias)
         {
             var httpApiName = HttpApi.GetName(typeof(THttpApi), false);
             var providerName = HttpApi.GetName(typeof(TTokenProvider), false);
-            return $"{providerName}+{httpApiName}";
+
+            var name = $"{providerName}+{httpApiName}";
+            if (string.IsNullOrEmpty(alias) == false)
+            {
+                name = $"{name}+{alias}";
+            }
+            return name;
         }
     }
 }
