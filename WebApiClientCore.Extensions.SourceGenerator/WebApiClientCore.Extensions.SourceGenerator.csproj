@@ -1,9 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
-	<PropertyGroup> 
+	<PropertyGroup>
 		<Nullable>enable</Nullable>
-		<TargetFrameworks>netstandard2.1;net5.0</TargetFrameworks>
-		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<DocumentationFile>$(TargetPath)\$(AssemblyName).xml</DocumentationFile>
 
 		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>Sign.snk</AssemblyOriginatorKeyFile>
@@ -15,14 +14,4 @@
 	<ItemGroup>
 		<ProjectReference Include="..\WebApiClientCore\WebApiClientCore.csproj" />
 	</ItemGroup>
-
-  <!--nuget analyzers和tools目录-->
-  <ItemGroup>
-    <None Include="NugetPackage\tools\*.*" PackagePath="tools" Pack="true" />
-    <None Include="NugetPackage\analyzers\dotnet\cs\**" PackagePath="analyzers\dotnet\cs" Pack="true" />
-  </ItemGroup>
-
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="dotnet publish ../WebApiClientCore.Analyzers.SourceGenerator/WebApiClientCore.Analyzers.SourceGenerator.csproj -c Release -o NugetPackage/analyzers/dotnet/cs" />
-  </Target>
 </Project>
