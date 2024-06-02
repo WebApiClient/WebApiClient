@@ -5,18 +5,28 @@ using System.Text;
 
 namespace WebApiClientCore.Analyzers.SourceGenerator
 {
-    sealed class DynamicDependencyBuilder
+    /// <summary>
+    /// HttpApi代理类初始化器
+    /// </summary>
+    sealed class HttpApiProxyClassInitializer
     {
         private readonly Compilation compilation;
-        private readonly IEnumerable<HttpApiCodeBuilder> codeBuilders;
+        private readonly IEnumerable<HttpApiProxyClass> proxyClasses;
 
-        public string FileName => "DynamicDependencyInitializer.g.cs";
-        public string ClassName => "DynamicDependencyInitializer_G";
+        /// <summary>
+        /// 文件名
+        /// </summary>
+        public string FileName => $"{nameof(HttpApiProxyClassInitializer)}.cs";
 
-        public DynamicDependencyBuilder(Compilation compilation, IEnumerable<HttpApiCodeBuilder> codeBuilders)
+        /// <summary>
+        /// HttpApi代理类初始化器
+        /// </summary>
+        /// <param name="compilation"></param>
+        /// <param name="proxyClasses"></param>
+        public HttpApiProxyClassInitializer(Compilation compilation, IEnumerable<HttpApiProxyClass> proxyClasses)
         {
             this.compilation = compilation;
-            this.codeBuilders = codeBuilders;
+            this.proxyClasses = proxyClasses;
         }
 
         /// <summary>
@@ -38,7 +48,7 @@ namespace WebApiClientCore.Analyzers.SourceGenerator
             builder.AppendLine($"namespace WebApiClientCore");
             builder.AppendLine("{");
             builder.AppendLine("    /// <summary>动态依赖初始化器</summary>");
-            builder.AppendLine($"    static partial class {this.ClassName}");
+            builder.AppendLine($"    static partial class {nameof(HttpApiProxyClassInitializer)}");
             builder.AppendLine("    {");
 
             builder.AppendLine($"""
@@ -49,15 +59,14 @@ namespace WebApiClientCore.Analyzers.SourceGenerator
                 """);
 
             builder.AppendLine("        [ModuleInitializer]");
-            foreach (var codeBuilder in this.codeBuilders)
+            foreach (var item in this.proxyClasses)
             {
-                builder.AppendLine($"        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof({codeBuilder.Namespace}.{codeBuilder.ClassName}))]");
+                builder.AppendLine($"        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof({item.Namespace}.{item.ClassName}))]");
             }
 
-            builder.AppendLine("        public static void AddDynamicDependency()");
+            builder.AppendLine("        public static void Initialize()");
             builder.AppendLine("        {");
             builder.AppendLine("        }");
-
             builder.AppendLine("    }");
             builder.AppendLine("}");
             builder.AppendLine("#endif");
