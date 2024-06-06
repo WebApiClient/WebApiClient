@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using WebApiClientCore.Exceptions;
@@ -68,38 +70,43 @@ namespace WebApiClientCore.Implementations
         /// <param name="httpApiType">接口类型</param> 
         /// <param name="proxyClassType">接口的实现类型</param>
         /// <returns></returns>
-        private static MethodInfo[] FindApiMethods(Type httpApiType, Type proxyClassType)
+        private static IEnumerable<MethodInfo> FindApiMethods(Type httpApiType, Type proxyClassType)
         {
-            var apiMethods = HttpApi.FindApiMethods(httpApiType);
-            var classMethods = proxyClassType.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance);
+            var apiMethods = HttpApi.FindApiMethods(httpApiType)
+                .Select(item => new MethodFeature(item, isProxyMethod: false))
+                .ToArray();
 
-            // 按照Index特征对apiMethods进行排序
-            var query = from a in apiMethods.Select(item => new MethodFeature(item, isProxyMethod: false))
-                        join c in classMethods.Select(item => new MethodFeature(item, isProxyMethod: true))
-                        on a equals c
-                        orderby c.Index
-                        select a.Method;
+            var classMethods = proxyClassType.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
+                .Select(item => new MethodFeature(item, isProxyMethod: true))
+                .Where(item => item.Index >= 0)
+                .ToArray();
 
-            var methods = query.ToArray();
-            if (apiMethods.Length != methods.Length)
+            if (apiMethods.Length != classMethods.Length)
             {
-                var missingMethod = apiMethods.Except(methods).FirstOrDefault();
-                var message = $"{httpApiType}的代理类缺失方法{missingMethod}";
+                var message = $"接口类型{httpApiType}的代理类{proxyClassType}和当前版本不兼容，请将{httpApiType.Assembly.GetName().Name}项目所依赖的WebApiClientCore更新到版本v{typeof(SourceGeneratorHttpApiActivator<>).Assembly.GetName().Version}";
                 throw new ProxyTypeException(httpApiType, message);
             }
-            return methods;
+
+            // 按照Index特征对apiMethods进行排序
+            return from a in apiMethods
+                   join c in classMethods
+                   on a equals c
+                   orderby c.Index
+                   select a.Method;
         }
 
         /// <summary>
         /// 表示MethodInfo的特征
         /// </summary>
+        [DebuggerDisplay("[{Index,nq}] {declaringType.FullName,nq}.{name,nq}")]
         private sealed class MethodFeature : IEquatable<MethodFeature>
         {
+            private readonly string name;
+            private readonly Type? declaringType;
+
             public MethodInfo Method { get; }
 
             public int Index { get; }
-
-            public string Name { get; }
 
             /// <summary>
             /// MethodInfo的特征
@@ -116,8 +123,18 @@ namespace WebApiClientCore.Implementations
                     attribute = method.GetCustomAttribute<HttpApiProxyMethodAttribute>();
                 }
 
-                this.Index = attribute == null ? -1 : attribute.Index;
-                this.Name = attribute == null ? $"{method.DeclaringType?.FullName}.{method.Name}" : attribute.Name;
+                if (attribute == null)
+                {
+                    this.Index = -1;
+                    this.declaringType = method.DeclaringType;
+                    this.name = method.Name;
+                }
+                else
+                {
+                    this.Index = attribute.Index;
+                    this.declaringType = attribute.DeclaringType;
+                    this.name = attribute.Name;
+                }
             }
 
             /// <summary>
@@ -127,7 +144,9 @@ namespace WebApiClientCore.Implementations
             /// <returns></returns>
             public bool Equals(MethodFeature? other)
             {
-                if (other == null || this.Name != other.Name)
+                if (other == null ||
+                    this.name != other.name ||
+                    this.declaringType != other.declaringType)
                 {
                     return false;
                 }
@@ -157,7 +176,9 @@ namespace WebApiClientCore.Implementations
             public override int GetHashCode()
             {
                 var hashCode = new HashCode();
-                hashCode.Add(this.Name);
+
+                hashCode.Add(this.declaringType);
+                hashCode.Add(this.name);
                 hashCode.Add(this.Method.ReturnType);
                 foreach (var parameter in this.Method.GetParameters())
                 {
