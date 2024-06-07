@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using WebApiClientCore.Exceptions;
 using WebApiClientCore.Internals;
 
@@ -13,7 +14,7 @@ namespace WebApiClientCore.Implementations
     /// 通过查找类型代理类型创建实例
     /// </summary>
     /// <typeparam name="THttpApi"></typeparam>
-    public class SourceGeneratorHttpApiActivator<
+    public sealed class SourceGeneratorHttpApiActivator<
 #if NET5_0_OR_GREATER
         [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
 #endif
@@ -21,7 +22,7 @@ namespace WebApiClientCore.Implementations
     {
         private readonly ApiActionInvoker[] actionInvokers;
         private readonly Func<IHttpApiInterceptor, ApiActionInvoker[], THttpApi> activator;
-        private static readonly Type? _proxyClassType = SourceGeneratorProxyClassType.Find(typeof(THttpApi));
+        private static readonly Type? _proxyClassType = SourceGeneratorProxyClassFinder.Find(typeof(THttpApi));
 
         /// <summary>
         /// 获取是否支持
@@ -51,7 +52,9 @@ namespace WebApiClientCore.Implementations
                 .Select(actionInvokerProvider.CreateActionInvoker)
                 .ToArray();
 
-            this.activator = LambdaUtil.CreateCtorFunc<IHttpApiInterceptor, ApiActionInvoker[], THttpApi>(proxyClassType);
+            this.activator = RuntimeFeature.IsDynamicCodeSupported
+                ? LambdaUtil.CreateCtorFunc<IHttpApiInterceptor, ApiActionInvoker[], THttpApi>(proxyClassType)
+                : (interceptor, invokers) => proxyClassType.CreateInstance<THttpApi>(interceptor, invokers);
         }
 
         /// <summary>
