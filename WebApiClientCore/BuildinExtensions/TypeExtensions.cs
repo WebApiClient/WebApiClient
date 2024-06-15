@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -61,14 +62,13 @@ namespace WebApiClientCore
         /// <param name="args">参数值</param>
         /// <exception cref="TypeInstanceCreateException"></exception>
         /// <returns></returns>
-        public static T CreateInstance<T>(this Type type, params object?[] args)
+        public static T CreateInstance<T>(
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+            this Type type, 
+            params object?[] args)
         {
             var instance = Activator.CreateInstance(type, args);
-            if (instance == null)
-            {
-                throw new TypeInstanceCreateException(type);
-            }
-            return (T)instance;
+            return instance == null ? throw new TypeInstanceCreateException(type) : (T)instance;
         }
 
         /// <summary>
@@ -76,7 +76,9 @@ namespace WebApiClientCore
         /// </summary> 
         /// <param name="interfaceType">接口类型</param> 
         /// <returns></returns>
-        public static Attribute[] GetInterfaceCustomAttributes(this Type interfaceType)
+        public static Attribute[] GetInterfaceCustomAttributes(
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+            this Type interfaceType)
         {
             return interfaceType
                 .GetInterfaces()

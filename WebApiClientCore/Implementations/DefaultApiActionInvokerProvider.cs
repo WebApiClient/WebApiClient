@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 
 namespace WebApiClientCore.Implementations
 {
@@ -17,9 +18,9 @@ namespace WebApiClientCore.Implementations
             var actionInvoker = this.CreateDefaultActionInvoker(actionDescriptor);
             if (actionDescriptor.Return.ReturnType.IsInheritFrom<Task>() == false)
             {
-                if (actionInvoker is IITaskReturnConvertable convertable)
+                if (actionInvoker is IITaskReturnConvertable conversable)
                 {
-                    actionInvoker = convertable.ToITaskReturnActionInvoker();
+                    actionInvoker = conversable.ToITaskReturnActionInvoker();
                 }
             }
             return actionInvoker;
@@ -29,10 +30,9 @@ namespace WebApiClientCore.Implementations
         /// 创建DefaultApiActionInvoker类型或其子类型的实例
         /// </summary>
         /// <param name="actionDescriptor">Action描述</param>
-        /// <returns></returns>
-#if NET5_0_OR_GREATER
-        [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors, typeof(DefaultApiActionInvoker<>))]
-#endif
+        /// <returns></returns> 
+        [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(DefaultApiActionInvoker<>))]
+        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL3050", Justification = "类型已使用DynamicDependency来阻止被裁剪")]
         protected virtual ApiActionInvoker CreateDefaultActionInvoker(ApiActionDescriptor actionDescriptor)
         {
             var resultType = actionDescriptor.Return.DataType.Type;

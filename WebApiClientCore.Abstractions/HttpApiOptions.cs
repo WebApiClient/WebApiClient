@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Xml;
@@ -15,7 +17,7 @@ namespace WebApiClientCore
     {
         /// <summary>
         /// 获取或设置Http服务完整主机域名
-        /// 例如http://www.abc.com/或http://www.abc.com/path/
+        /// 例如 http://www.abc.com/ 或 http://www.abc.com/path/
         /// 设置了HttpHost值，HttpHostAttribute将失效
         /// </summary>
         public Uri? HttpHost { get; set; }
@@ -43,12 +45,12 @@ namespace WebApiClientCore
 
 
         /// <summary>
-        /// 获取json序列化选项
+        /// 获取 json 序列化选项
         /// </summary>
         public JsonSerializerOptions JsonSerializeOptions { get; } = CreateJsonSerializeOptions();
 
         /// <summary>
-        /// 获取json反序列化选项
+        /// 获取 json 反序列化选项
         /// </summary>
         public JsonSerializerOptions JsonDeserializeOptions { get; } = CreateJsonDeserializeOptions();
 
@@ -63,7 +65,7 @@ namespace WebApiClientCore
         public XmlReaderSettings XmlDeserializeOptions { get; } = new XmlReaderSettings();
 
         /// <summary>
-        /// 获取keyValue序列化选项
+        /// 获取 keyValue 序列化选项
         /// </summary>
         public KeyValueSerializerOptions KeyValueSerializeOptions { get; } = new KeyValueSerializerOptions();
 
@@ -96,10 +98,14 @@ namespace WebApiClientCore
         /// 创建反序列化JsonSerializerOptions
         /// </summary>
         /// <returns></returns>
+        [UnconditionalSuppressMessage("Trimming", "IL3050", Justification = "JsonCompatibleConverter.EnumReader使用前已经判断RuntimeFeature.IsDynamicCodeSupported")]
         private static JsonSerializerOptions CreateJsonDeserializeOptions()
         {
             var options = CreateJsonSerializeOptions();
-            options.Converters.Add(JsonCompatibleConverter.EnumReader);
+            if (RuntimeFeature.IsDynamicCodeSupported)
+            {
+                options.Converters.Add(JsonCompatibleConverter.EnumReader);
+            }
             options.Converters.Add(JsonCompatibleConverter.DateTimeReader);
             return options;
         }

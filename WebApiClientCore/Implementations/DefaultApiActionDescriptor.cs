@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
@@ -17,6 +18,8 @@ namespace WebApiClientCore.Implementations
         /// 获取所在接口类型
         /// 这个值不一定是声明方法的接口类型
         /// </summary>
+
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
         public override Type InterfaceType { get; protected set; }
 
         /// <summary>
@@ -64,7 +67,8 @@ namespace WebApiClientCore.Implementations
         /// 请求Api描述
         /// for test only
         /// </summary>
-        /// <param name="method">接口的方法</param>
+        /// <param name="method">接口的方法</param> 
+        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2072", Justification = "允许DeclaringType被裁剪")]
         internal DefaultApiActionDescriptor(MethodInfo method)
             : this(method, method.DeclaringType!)
         {
@@ -75,7 +79,9 @@ namespace WebApiClientCore.Implementations
         /// </summary>
         /// <param name="method">接口的方法</param>
         /// <param name="interfaceType">接口类型</param> 
-        public DefaultApiActionDescriptor(MethodInfo method, Type interfaceType)
+        public DefaultApiActionDescriptor(
+            MethodInfo method,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type interfaceType)
         {
             var methodAttributes = method.GetCustomAttributes().ToArray();
             var interfaceAttributes = interfaceType.GetInterfaceCustomAttributes();

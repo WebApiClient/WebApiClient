@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+using WebApiClientCore.Exceptions;
 
 namespace WebApiClientCore.Implementations
 {
@@ -8,11 +11,8 @@ namespace WebApiClientCore.Implementations
     /// 不支持则回退使用EmitHttpApiActivator
     /// </summary>
     /// <typeparam name="THttpApi"></typeparam>
-    public class DefaultHttpApiActivator<
-#if NET5_0_OR_GREATER
-        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
-    THttpApi> : IHttpApiActivator<THttpApi>
+    public class DefaultHttpApiActivator<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] THttpApi>
+        : IHttpApiActivator<THttpApi>
     {
         private readonly IHttpApiActivator<THttpApi> httpApiActivator;
 
@@ -23,11 +23,21 @@ namespace WebApiClientCore.Implementations
         /// <param name="actionInvokerProvider"></param>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NotSupportedException"></exception>
+        [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "ILEmitHttpApiActivator使用之前已经使用RuntimeFeature.IsDynamicCodeCompiled来判断")]
         public DefaultHttpApiActivator(IApiActionDescriptorProvider apiActionDescriptorProvider, IApiActionInvokerProvider actionInvokerProvider)
         {
-            this.httpApiActivator = SourceGeneratorHttpApiActivator<THttpApi>.IsSupported
-                ? new SourceGeneratorHttpApiActivator<THttpApi>(apiActionDescriptorProvider, actionInvokerProvider)
-                : new ILEmitHttpApiActivator<THttpApi>(apiActionDescriptorProvider, actionInvokerProvider);
+            if (SourceGeneratorHttpApiActivator<THttpApi>.IsSupported)
+            {
+                this.httpApiActivator = new SourceGeneratorHttpApiActivator<THttpApi>(apiActionDescriptorProvider, actionInvokerProvider);
+            }
+            else if (RuntimeFeature.IsDynamicCodeCompiled)
+            {
+                this.httpApiActivator = new ILEmitHttpApiActivator<THttpApi>(apiActionDescriptorProvider, actionInvokerProvider);
+            }
+            else
+            {
+                throw new ProxyTypeCreateException(typeof(HttpApi));
+            }
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace WebApiClientCore
@@ -13,6 +14,8 @@ namespace WebApiClientCore
         /// </summary>
         /// <param name="method">接口的方法</param>
         /// <param name="interfaceType">接口类型</param> 
-        ApiActionDescriptor CreateActionDescriptor(MethodInfo method, Type interfaceType);
+        ApiActionDescriptor CreateActionDescriptor(
+            MethodInfo method,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type interfaceType);
     }
 }

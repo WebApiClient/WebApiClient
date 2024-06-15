@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using WebApiClientCore.HttpContents;
 using WebApiClientCore.Internals;
@@ -6,7 +7,7 @@ using WebApiClientCore.Internals;
 namespace WebApiClientCore.Attributes
 {
     /// <summary>
-    /// 表示json内容的结果特性
+    /// 表示 json 内容的结果特性
     /// </summary>
     public class JsonReturnAttribute : ApiReturnAttribute
     {
@@ -16,7 +17,7 @@ namespace WebApiClientCore.Attributes
         private static readonly string textJson = "text/json";
 
         /// <summary>
-        /// 问题描述json
+        /// 问题描述 json
         /// </summary>
         private static readonly string problemJson = "application/problem+json";
 
@@ -39,7 +40,7 @@ namespace WebApiClientCore.Attributes
 
         /// <summary>
         /// 指示响应的ContentType与AcceptContentType是否匹配
-        /// 返回false则调用下一个ApiReturnAttribute来处理响应结果
+        /// 返回 false 则调用下一个ApiReturnAttribute来处理响应结果
         /// </summary>
         /// <param name="responseContentType">响应的ContentType</param>
         /// <returns></returns>
@@ -54,7 +55,9 @@ namespace WebApiClientCore.Attributes
         /// 设置强类型模型结果值
         /// </summary>
         /// <param name="context">上下文</param>
-        /// <returns></returns>
+        /// <returns></returns> 
+        [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
+        [UnconditionalSuppressMessage("Trimming", "IL3050:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
         public override async Task SetResultAsync(ApiResponseContext context)
         {
             var resultType = context.ActionDescriptor.Return.DataType.Type;

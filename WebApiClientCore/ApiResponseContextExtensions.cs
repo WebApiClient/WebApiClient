@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -18,6 +19,8 @@ namespace WebApiClientCore
         /// <param name="context"></param>
         /// <param name="objType">目标类型</param>
         /// <returns></returns>
+        [RequiresDynamicCode("JSON serialization and deserialization might require types that cannot be statically analyzed and might need runtime code generation. Use System.Text.Json source generation for native AOT applications.")]
+        [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
         public static async Task<object?> JsonDeserializeAsync(this ApiResponseContext context, Type objType)
         {
             var response = context.HttpContext.ResponseMessage;
@@ -49,9 +52,7 @@ namespace WebApiClientCore
             else
             {
                 var utf8Json = await content.ReadAsByteArrayAsync().ConfigureAwait(false);
-                return utf8Json.Length == 0
-                    ? objType.DefaultValue()
-                    : JsonSerializer.Deserialize(utf8Json, objType, options);
+                return utf8Json.Length == 0 ? objType.DefaultValue() : JsonSerializer.Deserialize(utf8Json, objType, options);
             }
         }
 
@@ -61,6 +62,7 @@ namespace WebApiClientCore
         /// <param name="context"></param>
         /// <param name="objType">目标类型</param>
         /// <returns></returns>
+        [RequiresUnreferencedCode("Members from serialized types may be trimmed if not referenced directly")]
         public static async Task<object?> XmlDeserializeAsync(this ApiResponseContext context, Type objType)
         {
             var response = context.HttpContext.ResponseMessage;

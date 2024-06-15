@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -23,7 +24,9 @@ namespace WebApiClientCore.Implementations
         /// </summary>
         /// <param name="method"></param>
         /// <param name="interfaceType"></param>
-        public JsonFirstApiActionDescriptor(MethodInfo method, Type interfaceType)
+        public JsonFirstApiActionDescriptor(
+            MethodInfo method, 
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type interfaceType)
             : base(method, interfaceType)
         {
             var defineGetHead = this.Attributes.Any(a => this.IsGetHeadAttribute(a));
@@ -67,7 +70,7 @@ namespace WebApiClientCore.Implementations
         /// 是否为简单类型
         /// 这些类型缺省特性时仍然使用PathQueryAttribute
         /// </summary>
-        /// <param name="realType">真实类型，非nullable</param>
+        /// <param name="realType">真实类型，非 nullable</param>
         /// <returns></returns>
         protected virtual bool IsSimpleType(Type realType)
         {

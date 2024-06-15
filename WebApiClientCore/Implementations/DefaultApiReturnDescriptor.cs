@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
@@ -34,6 +35,7 @@ namespace WebApiClientCore.Implementations
         /// for test only
         /// </summary>
         /// <param name="method">方法信息</param>  
+        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2072", Justification = "允许DeclaringType被裁剪")]
         internal DefaultApiReturnDescriptor(MethodInfo method)
             : this(method, method.DeclaringType!)
         {
@@ -44,7 +46,9 @@ namespace WebApiClientCore.Implementations
         /// </summary>
         /// <param name="method">方法信息</param>
         /// <param name="interfaceType">接口类型</param> 
-        public DefaultApiReturnDescriptor(MethodInfo method, Type interfaceType)
+        public DefaultApiReturnDescriptor(
+            MethodInfo method,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type interfaceType)
             : this(method.ReturnType, method.GetCustomAttributes(), interfaceType.GetInterfaceCustomAttributes())
         {
         }

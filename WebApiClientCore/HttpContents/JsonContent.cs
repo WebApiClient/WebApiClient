@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using System.Text.Json;
 using WebApiClientCore.Internals;
 using WebApiClientCore.Serialization;
@@ -6,7 +7,7 @@ using WebApiClientCore.Serialization;
 namespace WebApiClientCore.HttpContents
 {
     /// <summary>
-    /// 表示uft8的json内容
+    /// 表示 uft8 的 json 内容
     /// </summary>
     public class JsonContent : BufferContent
     {
@@ -16,7 +17,7 @@ namespace WebApiClientCore.HttpContents
         public static string MediaType => "application/json";
 
         /// <summary>
-        /// uft8的json内容
+        /// uft8 的 json 内容
         /// </summary> 
         public JsonContent()
             : base(MediaType)
@@ -24,10 +25,12 @@ namespace WebApiClientCore.HttpContents
         }
 
         /// <summary>
-        /// uft8的json内容
+        /// uft8 的 json 内容
         /// </summary>
         /// <param name="value">对象值</param>
         /// <param name="jsonSerializerOptions">json序列化选项</param> 
+        [RequiresDynamicCode("JSON serialization and deserialization might require types that cannot be statically analyzed and might need runtime code generation. Use System.Text.Json source generation for native AOT applications.")]
+        [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
         public JsonContent(object? value, JsonSerializerOptions? jsonSerializerOptions)
             : this(value, jsonSerializerOptions, null)
         {
@@ -39,6 +42,8 @@ namespace WebApiClientCore.HttpContents
         /// <param name="value">对象值</param>
         /// <param name="jsonSerializerOptions">json序列化选项</param>
         /// <param name="encoding">编码</param>
+        [RequiresDynamicCode("JSON serialization and deserialization might require types that cannot be statically analyzed and might need runtime code generation. Use System.Text.Json source generation for native AOT applications.")]
+        [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
         public JsonContent(object? value, JsonSerializerOptions? jsonSerializerOptions, Encoding? encoding)
             : base(MediaType)
         {

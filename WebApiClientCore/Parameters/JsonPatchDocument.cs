@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Threading.Tasks;
 using WebApiClientCore.Exceptions;
@@ -17,7 +18,7 @@ namespace WebApiClientCore.Parameters
         /// <summary>
         /// 操作列表
         /// </summary>
-        private readonly List<object> operations = new();
+        private readonly List<object> operations = [];
 
         /// <summary>
         /// Add操作
@@ -68,6 +69,8 @@ namespace WebApiClientCore.Parameters
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
+        [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
+        [UnconditionalSuppressMessage("Trimming", "IL3050:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
         public Task OnRequestAsync(ApiParameterContext context)
         {
             if (context.HttpContext.RequestMessage.Method != HttpMethod.Patch)
@@ -95,7 +98,7 @@ namespace WebApiClientCore.Parameters
             /// 查看的内容
             /// </summary>
             [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-            public List<object> Oprations => this.target.operations;
+            public List<object> Operations => this.target.operations;
 
             /// <summary>
             /// 调试视图
