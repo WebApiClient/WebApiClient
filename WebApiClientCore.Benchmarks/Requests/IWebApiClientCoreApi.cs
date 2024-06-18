@@ -3,15 +3,20 @@ using WebApiClientCore.Attributes;
 
 namespace WebApiClientCore.Benchmarks.Requests
 {
+    [JsonReturn]
+    [XmlReturn(Enable = false)]
     public interface IWebApiClientCoreApi
     {
         [HttpGet("/benchmarks/{id}")]
-        Task<Model> GetAsync(string id);
+        Task GetAsync(string id);
+
+        [HttpGet("/benchmarks/{id}")]
+        Task<User> GetJsonAsync(string id);
 
         [HttpPost("/benchmarks")]
-        Task<Model> PostJsonAsync([JsonContent] Model model);
+        Task<User> PostJsonAsync([JsonContent] User model);
 
         [HttpPut("/benchmarks/{id}")]
-        Task<Model> PutFormAsync(string id, [FormContent] Model model);
+        Task<User> PutFormAsync(string id, [FormContent] User model);
     }
 }
