@@ -5,7 +5,7 @@ using System.Web;
 using WebApiClientCore.Attributes;
 using WebApiClientCore.Implementations;
 using Xunit;
-
+using System;
 
 namespace WebApiClientCore.Test.Attributes
 {
