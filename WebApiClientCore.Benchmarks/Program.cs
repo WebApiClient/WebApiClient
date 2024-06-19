@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Running;
-using System;
 using WebApiClientCore.Benchmarks.Requests;
 
 namespace WebApiClientCore.Benchmarks
@@ -10,9 +9,9 @@ namespace WebApiClientCore.Benchmarks
         {
             BenchmarkRunner.Run<HttpGetBenchmark>();
             BenchmarkRunner.Run<HttpGetJsonBenchmark>();
+            BenchmarkRunner.Run<HttpPostXmlBenchmark>();
             BenchmarkRunner.Run<HttpPostJsonBenchmark>();
             BenchmarkRunner.Run<HttpPutFormBenchmark>();
-            Console.ReadLine();
         }
     }
 }

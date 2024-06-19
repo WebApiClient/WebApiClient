@@ -3,9 +3,7 @@ using WebApiClientCore.Attributes;
 
 namespace WebApiClientCore.Benchmarks.Requests
 {
-    [JsonReturn]
-    [XmlReturn(Enable = false)]
-    public interface IWebApiClientCoreApi
+    public interface IWebApiClientCoreJsonApi
     {
         [HttpGet("/benchmarks/{id}")]
         Task GetAsync(string id);
