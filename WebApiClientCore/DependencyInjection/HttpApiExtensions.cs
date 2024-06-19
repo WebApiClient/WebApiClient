@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using WebApiClientCore;
 using WebApiClientCore.Implementations;
@@ -18,11 +19,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <typeparam name="THttpApi"></typeparam>
         /// <param name="services"></param>
         /// <returns></returns>
-        public static IHttpClientBuilder AddHttpApi<
-#if NET5_0_OR_GREATER
-        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
-        THttpApi>(this IServiceCollection services) where THttpApi : class
+        public static IHttpClientBuilder AddHttpApi<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] THttpApi>(
+            this IServiceCollection services) where THttpApi : class
         {
             var name = HttpApi.GetName(typeof(THttpApi));
 
@@ -45,11 +43,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         /// <param name="configureOptions">配置选项</param>
         /// <returns></returns>
-        public static IHttpClientBuilder AddHttpApi<
-#if NET5_0_OR_GREATER
-        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
-        THttpApi>(this IServiceCollection services, Action<HttpApiOptions> configureOptions) where THttpApi : class
+        public static IHttpClientBuilder AddHttpApi<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] THttpApi>(
+            this IServiceCollection services,
+            Action<HttpApiOptions> configureOptions) where THttpApi : class
         {
             return services
                 .AddHttpApi<THttpApi>()
@@ -63,11 +59,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         /// <param name="configureOptions">配置选项</param>
         /// <returns></returns>
-        public static IHttpClientBuilder AddHttpApi<
-#if NET5_0_OR_GREATER
-        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
-        THttpApi>(this IServiceCollection services, Action<HttpApiOptions, IServiceProvider> configureOptions) where THttpApi : class
+        public static IHttpClientBuilder AddHttpApi<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] THttpApi>(
+            this IServiceCollection services,
+            Action<HttpApiOptions, IServiceProvider> configureOptions) where THttpApi : class
         {
             return services
                 .AddHttpApi<THttpApi>()
@@ -82,7 +76,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="httpApiType">接口类型</param>
         /// <exception cref="ArgumentNullException"></exception>
         /// <returns></returns>
-        public static IHttpClientBuilder AddHttpApi(this IServiceCollection services, Type httpApiType)
+        public static IHttpClientBuilder AddHttpApi(
+            this IServiceCollection services,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type httpApiType)
         {
             if (httpApiType == null)
             {
@@ -105,7 +101,10 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="configureOptions">配置选项</param>
         /// <exception cref="ArgumentNullException"></exception>
         /// <returns></returns>
-        public static IHttpClientBuilder AddHttpApi(this IServiceCollection services, Type httpApiType, Action<HttpApiOptions> configureOptions)
+        public static IHttpClientBuilder AddHttpApi(
+            this IServiceCollection services,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type httpApiType,
+            Action<HttpApiOptions> configureOptions)
         {
             return services
                 .AddHttpApi(httpApiType)
@@ -120,7 +119,10 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="configureOptions">配置选项</param>
         /// <exception cref="ArgumentNullException"></exception>
         /// <returns></returns>
-        public static IHttpClientBuilder AddHttpApi(this IServiceCollection services, Type httpApiType, Action<HttpApiOptions, IServiceProvider> configureOptions)
+        public static IHttpClientBuilder AddHttpApi(
+            this IServiceCollection services,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type httpApiType,
+            Action<HttpApiOptions, IServiceProvider> configureOptions)
         {
             return services
                 .AddHttpApi(httpApiType)
@@ -133,11 +135,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// 表示THttpApi提供者
         /// </summary>
         /// <typeparam name="THttpApi"></typeparam>
-        private class HttpApiProvider<
-#if NET5_0_OR_GREATER
-        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
-        THttpApi>
+        private class HttpApiProvider<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] THttpApi>
         {
             private readonly IHttpClientFactory httpClientFactory;
             private readonly IOptionsMonitor<HttpApiOptions> httpApiOptionsMonitor;
@@ -190,11 +188,9 @@ namespace Microsoft.Extensions.DependencyInjection
             /// </summary>
             /// <param name="httpApiType">接口类型</param>
             /// <returns></returns>
-
-#if NET5_0_OR_GREATER
-            [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors, typeof(HttpApiAdderOf<>))]
-#endif
-            public static HttpApiAdder Create(Type httpApiType)
+            [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(HttpApiAdderOf<>))]
+            [UnconditionalSuppressMessage("ReflectionAnalysis", "IL3050", Justification = "类型已使用DynamicDependency来阻止被裁剪")]
+            public static HttpApiAdder Create([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type httpApiType)
             {
                 var adderType = typeof(HttpApiAdderOf<>).MakeGenericType(httpApiType);
                 return adderType.CreateInstance<HttpApiAdder>();
@@ -204,11 +200,8 @@ namespace Microsoft.Extensions.DependencyInjection
             /// 表示HttpApi服务添加者
             /// </summary>
             /// <typeparam name="THttpApi"></typeparam>
-            private class HttpApiAdderOf<
-#if NET5_0_OR_GREATER
-        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
-            THttpApi> : HttpApiAdder where THttpApi : class
+            private class HttpApiAdderOf<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] THttpApi>
+                : HttpApiAdder where THttpApi : class
             {
                 /// <summary>
                 /// 添加HttpApi代理类到服务

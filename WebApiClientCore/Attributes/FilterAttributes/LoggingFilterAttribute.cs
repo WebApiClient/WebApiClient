@@ -97,15 +97,15 @@ namespace WebApiClientCore.Attributes
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        private static async Task<string?> ReadRequestContentAsync(HttpApiRequestMessage request)
+        private static async ValueTask<string?> ReadRequestContentAsync(HttpApiRequestMessage request)
         {
             if (request.Content == null)
             {
                 return null;
             }
 
-            return request.Content is ICustomHttpContentConvertable convertable
-                ? await convertable.ToCustomHttpContext().ReadAsStringAsync().ConfigureAwait(false)
+            return request.Content is ICustomHttpContentConvertable conversable
+                ? await conversable.ToCustomHttpContext().ReadAsStringAsync().ConfigureAwait(false)
                 : await request.Content.ReadAsStringAsync().ConfigureAwait(false);
         }
 
@@ -122,12 +122,9 @@ namespace WebApiClientCore.Attributes
                 return null;
             }
 
-            if (content.IsBuffered() == true || context.GetCompletionOption() == HttpCompletionOption.ResponseContentRead)
-            {
-                return await content.ReadAsStringAsync().ConfigureAwait(false);
-            }
-
-            return "...";
+            return content.IsBuffered() == true 
+                ? await content.ReadAsStringAsync(context.RequestAborted).ConfigureAwait(false) 
+                : "...";
         }
 
         /// <summary>

@@ -24,7 +24,7 @@ namespace WebApiClientCore.Internals
         }
 
         /// <summary>
-        /// 添加char
+        /// 添加 char
         /// </summary>
         /// <param name="value"></param> 
         public void Append(char value)
@@ -40,7 +40,7 @@ namespace WebApiClientCore.Internals
         }
 
         /// <summary>
-        /// 添加chars
+        /// 添加 chars
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -59,6 +59,17 @@ namespace WebApiClientCore.Internals
 
             value.CopyTo(this.chars[this.index..]);
             this.index = newSize;
+        }
+
+        /// <summary>
+        /// 添加 chars 并换行
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public void AppendLine(ReadOnlySpan<char> value)
+        {
+            this.Append(value);
+            this.Append(Environment.NewLine);
         }
 
         /// <summary>
@@ -87,7 +98,7 @@ namespace WebApiClientCore.Internals
         /// <returns></returns>
         public override readonly string ToString()
         {
-            return this.chars.Slice(0, this.index).ToString();
+            return this.chars[..this.index].ToString();
         }
     }
 }

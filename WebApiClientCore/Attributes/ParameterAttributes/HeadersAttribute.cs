@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 using WebApiClientCore.Exceptions;
 
 namespace WebApiClientCore.Attributes
@@ -11,7 +12,7 @@ namespace WebApiClientCore.Attributes
     {
         /// <summary>
         /// 获取或设置是否将请求名的_转换为-
-        /// 默认为true
+        /// 默认为 true
         /// </summary>
         public bool UnderlineToMinus { get; set; } = true;
 
@@ -21,6 +22,8 @@ namespace WebApiClientCore.Attributes
         /// <param name="context">上下文</param>
         /// <exception cref="ApiInvalidConfigException"></exception>
         /// <returns></returns>
+        [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
+        [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "<Pending>")]
         public override Task OnRequestAsync(ApiParameterContext context)
         {
             foreach (var item in context.SerializeToKeyValues())

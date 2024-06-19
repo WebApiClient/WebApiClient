@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Xml;
@@ -14,11 +15,12 @@ namespace WebApiClientCore.Serialization
         private static readonly XmlWriterSettings writerSettings = new();
 
         /// <summary>
-        /// 将对象序列化为xml文本
+        /// 将对象序列化为Xml文本
         /// </summary>
         /// <param name="obj">对象</param>
         /// <param name="options">配置选项</param> 
         /// <returns></returns>
+        [RequiresUnreferencedCode("Members from serialized types may be trimmed if not referenced directly")]
         public static string? Serialize(object? obj, XmlWriterSettings? options)
         {
             if (obj == null)
@@ -35,12 +37,13 @@ namespace WebApiClientCore.Serialization
         }
 
         /// <summary>
-        /// 将xml文本反序列化对象
+        /// 将Xml文本反序列化对象
         /// </summary>
         /// <param name="xml">xml文本内容</param>
         /// <param name="objType">对象类型</param>
         /// <param name="options">配置选项</param>
         /// <returns></returns>
+        [RequiresUnreferencedCode("Members from serialized types may be trimmed if not referenced directly")]
         public static object? Deserialize(string? xml, Type objType, XmlReaderSettings? options)
         {
             if (objType == null)

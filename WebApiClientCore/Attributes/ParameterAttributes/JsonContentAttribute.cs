@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading.Tasks;
 using WebApiClientCore.HttpContents;
@@ -6,7 +7,7 @@ using WebApiClientCore.HttpContents;
 namespace WebApiClientCore.Attributes
 {
     /// <summary>
-    /// 使用JsonSerializer序列化参数值得到的json文本作为application/json请求
+    /// 使用JsonSerializer序列化参数值得到的 json 文本作为 application/json 请求
     /// 每个Api只能注明于其中的一个参数
     /// </summary>
     public class JsonContentAttribute : HttpContentAttribute, ICharSetable
@@ -27,10 +28,12 @@ namespace WebApiClientCore.Attributes
         }
 
         /// <summary>
-        /// 设置参数到http请求内容
+        /// 设置参数到 http 请求内容
         /// </summary>
         /// <param name="context">上下文</param>
         /// <returns></returns>
+        [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
+        [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "<Pending>")]
         protected override Task SetHttpContentAsync(ApiParameterContext context)
         {
             var options = context.HttpContext.HttpApiOptions.JsonSerializeOptions;

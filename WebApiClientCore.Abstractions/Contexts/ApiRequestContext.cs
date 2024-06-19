@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 
 namespace WebApiClientCore
@@ -9,7 +10,7 @@ namespace WebApiClientCore
     public class ApiRequestContext
     {
         /// <summary>
-        /// 获取http上下文
+        /// 获取 http 上下文
         /// </summary>
         public HttpContext HttpContext { get; }
 
@@ -21,8 +22,9 @@ namespace WebApiClientCore
         /// <summary>
         /// 获取关联的ApiAction描述 
         /// </summary>
+        [Obsolete("Use ActionDescriptor instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]       
         public ApiActionDescriptor ApiAction => this.ActionDescriptor;
 
         /// <summary>

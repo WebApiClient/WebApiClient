@@ -1,7 +1,8 @@
 ﻿using System.IO;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using WebApiClientCore;
+using WebApiClientCore.Internals;
 
 namespace System.Net.Http
 {
@@ -17,9 +18,11 @@ namespace System.Net.Http
         /// <returns></returns>
         public static string GetHeadersString(this HttpResponseMessage response)
         {
-            var builder = new StringBuilder()
-                .AppendLine($"HTTP/{response.Version} {(int)response.StatusCode} {response.ReasonPhrase}")
-                .Append(response.Headers.ToString());
+            Span<char> buffer = stackalloc char[4 * 1024];
+            var builder = new ValueStringBuilder(buffer);
+
+            builder.AppendLine($"HTTP/{response.Version} {(int)response.StatusCode} {response.ReasonPhrase}");
+            builder.Append(response.Headers.ToString());
 
             if (response.Content != null)
             {
@@ -71,11 +74,7 @@ namespace System.Net.Http
                 throw new ArgumentNullException(nameof(destination));
             }
 
-#if NET5_0_OR_GREATER
             var source = await httpResponse.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-#else
-            var source = await httpResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
-#endif
             await source.CopyToAsync(destination, cancellationToken).ConfigureAwait(false);
         }
 
@@ -102,18 +101,11 @@ namespace System.Net.Http
             var fileSize = httpResponse.Content.Headers.ContentLength;
 
             var buffer = new byte[8 * 1024];
-#if NET5_0_OR_GREATER
+
             var source = await httpResponse.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-#else
-            var source = await httpResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
-#endif
             while (isCompleted == false && cancellationToken.IsCancellationRequested == false)
             {
-#if NET5_0_OR_GREATER
-                var length = await source.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
-#else
                 var length = await source.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false);
-#endif
                 if (length == 0)
                 {
                     fileSize ??= recvSize;
@@ -122,11 +114,7 @@ namespace System.Net.Http
                 else
                 {
                     recvSize += length;
-#if NET5_0_OR_GREATER
-                    await destination.WriteAsync(buffer.AsMemory(0, length), cancellationToken).ConfigureAwait(false);
-#else
                     await destination.WriteAsync(buffer, 0, length, cancellationToken).ConfigureAwait(false);
-#endif
                     await destination.FlushAsync(cancellationToken).ConfigureAwait(false);
                 }
 

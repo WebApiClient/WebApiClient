@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using WebApiClientCore.Exceptions;
@@ -13,11 +14,8 @@ namespace WebApiClientCore.Implementations
     /// 通过查找类型代理类型创建实例
     /// </summary>
     /// <typeparam name="THttpApi"></typeparam>
-    public sealed class SourceGeneratorHttpApiActivator<
-#if NET5_0_OR_GREATER
-        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
-    THttpApi> : IHttpApiActivator<THttpApi>
+    public sealed class SourceGeneratorHttpApiActivator<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] THttpApi>
+        : IHttpApiActivator<THttpApi>
     {
         private readonly ApiActionInvoker[] actionInvokers;
         private readonly Func<IHttpApiInterceptor, ApiActionInvoker[], THttpApi> activator;
@@ -36,6 +34,7 @@ namespace WebApiClientCore.Implementations
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NotSupportedException"></exception>
         /// <exception cref="ProxyTypeCreateException"></exception>
+        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2077", Justification = "类型 proxyClassType 已使用ModuleInitializer和DynamicDependency来阻止被裁剪")]
         public SourceGeneratorHttpApiActivator(IApiActionDescriptorProvider apiActionDescriptorProvider, IApiActionInvokerProvider actionInvokerProvider)
         {
             var httpApiType = typeof(THttpApi);
@@ -70,7 +69,9 @@ namespace WebApiClientCore.Implementations
         /// <param name="httpApiType">接口类型</param> 
         /// <param name="proxyClassType">接口的实现类型</param>
         /// <returns></returns>
-        private static IEnumerable<MethodInfo> FindApiMethods(Type httpApiType, Type proxyClassType)
+        private static IEnumerable<MethodInfo> FindApiMethods(
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type httpApiType,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type proxyClassType)
         {
             var apiMethods = HttpApi.FindApiMethods(httpApiType)
                 .Select(item => new MethodFeature(item, isProxyMethod: false))
@@ -87,7 +88,7 @@ namespace WebApiClientCore.Implementations
                 throw new ProxyTypeException(httpApiType, message);
             }
 
-            // 按照Index特征对apiMethods进行排序
+            // 按照 Index 特征对 apiMethods 进行排序
             return from a in apiMethods
                    join c in classMethods
                    on a equals c

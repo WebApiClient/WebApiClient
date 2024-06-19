@@ -1,19 +1,18 @@
-﻿using System.Net.Http.Headers;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using WebApiClientCore.HttpContents;
-using WebApiClientCore.Internals;
 
 namespace WebApiClientCore.Attributes
 {
     /// <summary>
-    /// 表示xml内容的结果特性
+    /// 表示 xml 内容的结果特性
     /// </summary>
     public class XmlReturnAttribute : ApiReturnAttribute
     {
-        /// <summary>
-        /// text/xml
-        /// </summary>
-        private static readonly string textXml = "text/xml";
+        private static readonly HashSet<string> allowMediaTypes = new([XmlContent.MediaType, "text/xml"], StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// xml内容的结果特性
@@ -34,14 +33,14 @@ namespace WebApiClientCore.Attributes
 
         /// <summary>
         /// 指示响应的ContentType与AcceptContentType是否匹配
-        /// 返回false则调用下一个ApiReturnAttribute来处理响应结果
+        /// 返回 false 则调用下一个ApiReturnAttribute来处理响应结果
         /// </summary>
         /// <param name="responseContentType">响应的ContentType</param>
         /// <returns></returns>
         protected override bool IsMatchAcceptContentType(MediaTypeHeaderValue responseContentType)
         {
-            return base.IsMatchAcceptContentType(responseContentType) 
-                || MediaTypeUtil.IsMatch(textXml, responseContentType.MediaType);
+            var mediaType = responseContentType.MediaType;
+            return mediaType != null && allowMediaTypes.Contains(mediaType);
         }
 
         /// <summary>
@@ -49,6 +48,7 @@ namespace WebApiClientCore.Attributes
         /// </summary>
         /// <param name="context">上下文</param>
         /// <returns></returns>
+        [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
         public override async Task SetResultAsync(ApiResponseContext context)
         {
             var resultType = context.ActionDescriptor.Return.DataType.Type;

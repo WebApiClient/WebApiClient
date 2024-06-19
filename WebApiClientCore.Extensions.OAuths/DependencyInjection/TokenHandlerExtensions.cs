@@ -1,16 +1,17 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using WebApiClientCore.Extensions.OAuths;
 using WebApiClientCore.Extensions.OAuths.HttpMessageHandlers;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
-    /// 提供OAuth授权token应用的http消息处理程序扩展
+    /// 提供OAuth授权 token 应用的 http 消息处理程序扩展
     /// </summary>
     public static class TokenHandlerExtensions
     {
         /// <summary>
-        /// 添加token应用的http消息处理程序
+        /// 添加 token 应用的 http 消息处理程序
         /// 需要为接口或接口的基础接口注册TokenProvider
         /// </summary>
         /// <remarks>
@@ -26,7 +27,7 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// 添加token应用的http消息处理程序
+        /// 添加 token 应用的 http 消息处理程序
         /// 需要为接口或接口的基础接口注册TokenProvider
         /// </summary>
         /// <remarks>
@@ -35,16 +36,17 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </remarks>
         /// <typeparam name="TOAuthTokenHandler"></typeparam>
         /// <param name="builder"></param>
-        /// <param name="handlerFactory">hanlder的创建委托</param>
+        /// <param name="handlerFactory">handler的创建委托</param>
         /// <param name="tokenProviderSearchMode">token提供者的查找模式</param> 
         /// <returns></returns>
+        [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2072", Justification = "类型 httpApiType 明确是不会被裁剪的")]
         public static IHttpClientBuilder AddOAuthTokenHandler<TOAuthTokenHandler>(this IHttpClientBuilder builder, Func<IServiceProvider, ITokenProvider, TOAuthTokenHandler> handlerFactory, TypeMatchMode tokenProviderSearchMode = TypeMatchMode.TypeOrBaseTypes)
             where TOAuthTokenHandler : OAuthTokenHandler
         {
             var httpApiType = builder.GetHttpApiType();
             if (httpApiType == null)
             {
-                throw new InvalidOperationException($"无效的{nameof(IHttpClientBuilder)}，找不到其关联的http接口类型");
+                throw new InvalidOperationException($"无效的{nameof(IHttpClientBuilder)}，找不到其关联的 http 接口类型");
             }
 
             return builder.AddHttpMessageHandler(serviceProvider =>

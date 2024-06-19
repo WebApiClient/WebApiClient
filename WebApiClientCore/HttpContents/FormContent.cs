@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -13,7 +14,7 @@ using WebApiClientCore.Serialization;
 namespace WebApiClientCore.HttpContents
 {
     /// <summary>
-    /// 表示键值对表单内容
+    /// 表示 application/x-www-form-urlencoded 表单内容
     /// </summary>
     public class FormContent : HttpContent
     {
@@ -23,7 +24,7 @@ namespace WebApiClientCore.HttpContents
         private readonly RecyclableBufferWriter<byte> bufferWriter = new();
 
         /// <summary>
-        /// 默认的http编码
+        /// 默认的 http 编码
         /// </summary>
         private static readonly Encoding httpEncoding = Encoding.GetEncoding(28591);
 
@@ -34,7 +35,7 @@ namespace WebApiClientCore.HttpContents
 
 
         /// <summary>
-        /// 键值对表单内容
+        /// application/x-www-form-urlencoded 表单内容
         /// </summary>
         public FormContent()
         {
@@ -42,7 +43,7 @@ namespace WebApiClientCore.HttpContents
         }
 
         /// <summary>
-        /// 键值对表单内容
+        /// application/x-www-form-urlencoded 表单内容
         /// </summary>
         /// <param name="keyValues">键值对</param> 
         public FormContent(IEnumerable<KeyValue> keyValues)
@@ -52,10 +53,12 @@ namespace WebApiClientCore.HttpContents
         }
 
         /// <summary>
-        /// 键值对表单内容
+        /// application/x-www-form-urlencoded 表单内容
         /// </summary>
         /// <param name="value">模型对象值</param>
         /// <param name="options">序列化选项</param>
+        [RequiresDynamicCode("JSON serialization and deserialization might require types that cannot be statically analyzed and might need runtime code generation. Use System.Text.Json source generation for native AOT applications.")]
+        [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
         public FormContent(object? value, KeyValueSerializerOptions? options)
         {
             if (value != null)
@@ -184,7 +187,7 @@ namespace WebApiClientCore.HttpContents
         /// 从HttpContent转换得到
         /// </summary>
         /// <param name="httpContent">httpContent实例</param>
-        /// <param name="disposeHttpContent">是否释放httpContent</param>
+        /// <param name="disposeHttpContent">是否释放 httpContent</param>
         /// <returns></returns>
         public static async Task<FormContent> ParseAsync(HttpContent? httpContent, bool disposeHttpContent = true)
         {
