@@ -25,7 +25,7 @@ namespace App
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host
-                .CreateDefaultBuilder(args)
+                .CreateDefaultBuilder(args) 
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

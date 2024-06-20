@@ -1,5 +1,4 @@
-﻿using System;
-using System.Buffers;
+﻿using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
@@ -30,16 +29,9 @@ namespace WebApiClientCore.Serialization
                 return;
             }
 
-            var jsonOptions = options ?? defaultOptions;
-            var writerOptions = new JsonWriterOptions
-            {
-                SkipValidation = true,
-                Encoder = jsonOptions.Encoder,
-                Indented = jsonOptions.WriteIndented
-            };
-
-            using var utf8JsonWriter = new Utf8JsonWriter(bufferWriter, writerOptions);
-            JsonSerializer.Serialize(utf8JsonWriter, obj, obj.GetType(), jsonOptions);
+            options ??= defaultOptions;
+            var utf8JsonWriter = Utf8JsonWriterCache.Get(bufferWriter, options);
+            JsonSerializer.Serialize(utf8JsonWriter, obj, obj.GetType(), options);
         }
     }
 }

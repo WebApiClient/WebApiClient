@@ -10,7 +10,7 @@ using WebApiClientCore.Internals;
 namespace WebApiClientCore.HttpContents
 {
     /// <summary>
-    /// 表示 utf8 的BufferContent
+    /// 表示缓冲的 Http 内容
     /// </summary>
     public class BufferContent : HttpContent, IBufferWriter<byte>
     {
@@ -20,11 +20,31 @@ namespace WebApiClientCore.HttpContents
         private readonly RecyclableBufferWriter<byte> bufferWriter = new();
 
         /// <summary>
-        /// utf8的BufferContent
+        /// 获取已数入的数据
+        /// </summary>
+        protected ArraySegment<byte> WrittenSegment => this.bufferWriter.WrittenSegment;
+
+        /// <summary>
+        /// 缓冲的 Http 内容
         /// </summary> 
         public BufferContent(string mediaType)
+            : this(new MediaTypeHeaderValue(mediaType))
         {
-            this.Headers.ContentType = new MediaTypeHeaderValue(mediaType);
+        }
+
+        /// <summary>
+        /// 缓冲的 Http 内容
+        /// </summary> 
+        public BufferContent(MediaTypeHeaderValue mediaType)
+        {
+            this.Headers.ContentType = mediaType;
+        }
+
+        /// <summary>
+        /// 缓冲的 Http 内容
+        /// </summary>
+        protected BufferContent()
+        {
         }
 
         /// <summary>
@@ -76,6 +96,14 @@ namespace WebApiClientCore.HttpContents
         {
             this.EnsureNotBuffered();
             this.bufferWriter.Write(buffer);
+        }
+
+        /// <summary>
+        /// 清除数据
+        /// </summary>
+        public void Clear()
+        {
+            this.bufferWriter.Clear();
         }
 
         /// <summary>
